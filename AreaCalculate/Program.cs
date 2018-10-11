@@ -15,14 +15,14 @@ namespace AreaCalculate
         /// <summary>
         /// Y坐标的最大值
         /// </summary>
-        public static int MAX = 10;
+        public static int MAX = 30;
 
         /// <summary>
         /// 生成数据
         /// </summary>
         /// <param name="seed">一位种子</param>
         /// <param name="count">生成数据的数量</param>
-        /// <returns></returns>
+        /// <returns>随机出来的数组</returns>
         public static ArrayList Making(int seed, int count)
         {
             Random random = new Random(seed);
@@ -38,14 +38,15 @@ namespace AreaCalculate
         /// 根据X坐标生成Y坐标
         /// </summary>
         /// <param name="seed">X坐标</param>
-        /// <returns></returns>
+        /// <returns>随机生成的Y坐标</returns>
         public static ArrayList Making(int[] seed)
         {
             ArrayList list = new ArrayList();
             for (int i = 0; i < seed.Length; ++i)
             {
                 Random random = new Random(seed[i]);
-                list.Add(random.Next(MAX));
+                //这里随机不出0。。。
+                list.Add(random.Next(MAX) - 1);
             }
             return list;
         }
@@ -86,6 +87,45 @@ namespace AreaCalculate
     }
 
     /// <summary>
+    /// 圆
+    /// </summary>
+    class Circle : IShape
+    {
+        static readonly Double PI = 3.14;
+        Double r;
+
+        public Circle(Double r)
+        {
+            this.r = r;
+        }
+
+        public Double Arae()
+        {
+            return 2*PI*r*r;
+        }
+    }
+
+    /// <summary>
+    /// 矩形
+    /// </summary>
+    class Rectangle : IShape
+    {
+        Double height;
+        Double width;
+
+        public Rectangle(Double height,Double width)
+        {
+            this.height = height;
+            this.width = width;
+        }
+
+        public Double Arae()
+        {
+            return height * width;
+        }
+    }
+
+    /// <summary>
     /// 不规则图形
     /// </summary>
     class UShape : IShape
@@ -104,13 +144,19 @@ namespace AreaCalculate
             {
                 for (int j = i+1; j < x.Count; ++j)
                 {
-                    if (x[i] == x[j] && y[i] == y[j])
+                    if ((int)x[i] == (int)x[j] && (int)y[i] == (int)y[j])
                     {
-                        x.RemoveAt(i);
-                        y.RemoveAt(i);
+                        x.RemoveAt(j);
+                        y.RemoveAt(j);
+                        --j;
+                        continue;
                     }
                 }
             }
+            //这里的排序是为了打印图形而准备的，打印的时候插入字符*需要从小到大插
+            x.Sort();
+            y.Sort();
+
             XList = ((int[])x.ToArray(typeof(int)));
             YList = ((int[])y.ToArray(typeof(int)));
         }
@@ -154,7 +200,7 @@ namespace AreaCalculate
                         //X为0的情况
                         if (XList[j] != 0 )
                         {
-                            s.Insert(tab.Length * (XList[j] - 1), "  *");
+                            s.Insert(tab.Length * (XList[j]-1), "  *");
                         }
                         else
                         {
@@ -170,12 +216,12 @@ namespace AreaCalculate
 
             ArrayList zeroList = new ArrayList();
 
-            //找出Y坐标为0的点
+            //找出Y坐标为0的点,并将X值储存起来
             for (int i = 0; i < YList.Length;++i)
             {
                 if (YList[i] == 0)
                 {
-                    zeroList.Add(i);
+                    zeroList.Add(XList[i]);
                 }
             }
             if (zeroList.Count > 0 && (int)zeroList[0] == 0)
@@ -208,6 +254,7 @@ namespace AreaCalculate
             {
                 Console.Write("{0,3}", i);
             }
+            Console.WriteLine();
         }
 
         private int GetMax(int[] list)
@@ -238,9 +285,22 @@ namespace AreaCalculate
     {
         public static void Main(string[] args)
         {
-            int[] x = ((int[])DataMaker.Making((int)DateTime.Now.Ticks,10).ToArray(typeof(int))); ;
-            UShape u = new UShape(x);
-            u.Print();
+            ArrayList array = DataMaker.Making((int)DateTime.Now.Ticks, 30);
+            foreach (var i in array)
+            {
+                Console.Write("{0,2}",i);
+            }
+
+            while (true)
+            {
+                int[] x = ((int[])DataMaker.Making((int)DateTime.Now.Ticks, 30).ToArray(typeof(int))); ;
+                UShape u = new UShape(x);
+                u.Print();
+                Console.WriteLine();
+                Console.Write("图形的面积是：{0}", u.Arae());
+                Console.ReadKey();
+            }
+
             Console.ReadKey();
         }
     }
