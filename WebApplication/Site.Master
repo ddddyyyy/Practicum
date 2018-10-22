@@ -1,0 +1,34 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.master.cs" Inherits="WebApplication.SiteMaster" %>
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head runat="server">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%: Page.Title %>通讯录</title>
+    <style>
+    .main{
+margin-left: auto;
+margin-right: auto;
+}
+</style>
+    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+</head>
+<body>
+    <asp:Label ID="Label1" runat="server" Text="通讯录"></asp:Label>
+    <form id="form1" runat="server">
+        
+        <asp:TextBox ID="LoginUser" runat="server"></asp:TextBox>
+        <asp:Button ID="Button1" runat="server" Text="登陆" OnClick="Login" />
+        <asp:HyperLink  runat="server" Text="查看用户"  NavigateUrl="~/UserList.aspx"
+                  />
+        <asp:LinkButton Text="查看评价" runat="server" />
+        <div runat="server" class="main">
+            <asp:ContentPlaceHolder runat="server" ID="Main" />
+        </div>
+    </form>
+    
+</body>
+</html>
