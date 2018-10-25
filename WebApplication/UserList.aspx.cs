@@ -28,12 +28,18 @@ namespace WebApplication
 
         public void Delete(int Id)
         {
+
             list.Remove(list.Single(i => i.Id == Id));
             Mapper.GetInstance().Delete(Id);
         }
 
         protected void New(object sender, EventArgs e)
         {
+            if (null != Session["user"] && ((((Model.User)Session["user"]).Role != Model.Roles.全权用户)))
+            {
+                Page.ClientScript.RegisterStartupScript(this.GetType(), "message", "alert('无权限！！！')", true);
+                return;
+            }
             User user = new User();
             Mapper.GetInstance().Insert(ref user);
             list.Add(user);
@@ -48,13 +54,21 @@ namespace WebApplication
         //     string sortByExpression
         public IQueryable<WebApplication.Model.User> GridView1_GetData()
         {
-            TextBox text = (TextBox)Page.FindControl("LoginUser");
-
-            if (text.Text == null)
-            {
-                Page.ClientScript.RegisterStartupScript(this.GetType(), "message", "alert('登陆！！！')", true);
-            }
             
+            TextBox text = Page.Master.FindControl("LoginUser") as TextBox;
+            Button button = Page.Master.FindControl("Button1") as Button;
+
+            if (Session["user"]==null)
+            {
+                Page.ClientScript.RegisterStartupScript(this.GetType(), "message", "alert('请先登录！！！')", true);
+                return null;
+            }
+            else
+            {
+                text.ReadOnly = true;
+                text.Text = ((User)Session["user"]).Id.ToString();
+                button.Text = "退出登陆";
+            }
             if (list == null) { list = Mapper.GetInstance().Select(); }
             
             return list.AsQueryable();

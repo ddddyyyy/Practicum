@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using WebApplication.Model;
 using WebApplication.ORM;
 
 namespace WebApplication
@@ -12,11 +13,29 @@ namespace WebApplication
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            TextBox text = Page.Master.FindControl("LoginUser") as TextBox;
+            Button button = Page.Master.FindControl("Button1") as Button;
 
+            if (Session["user"] == null)
+            {
+                Page.ClientScript.RegisterStartupScript(this.GetType(), "message", "alert('请先登录！！！')", true);
+            }
+            else
+            {
+                text.ReadOnly = true;
+                text.Text = ((User)Session["user"]).Id.ToString();
+                button.Text = "退出登陆";
+            }
         }
 
         protected void Submit(object sender, EventArgs e)
         {
+            if (null != Session["user"] && ((((Model.User)Session["user"]).Role == Model.Roles.只读用户) || ((Model.User)Session["user"]).Role == Model.Roles.非法用户))
+            {
+                Page.ClientScript.RegisterStartupScript(this.GetType(), "message", "alert('无权限！！！')", true);
+                return;
+            }
+              
             Model.Comment c = new Model.Comment();
             c.Cuid = int.Parse(Request.QueryString["Id"]);
             c.Content = TextBox123.Text;
